@@ -10,30 +10,6 @@ const users = [
   {username: 'user2', password: 'pw2', name: 'นางสาวทดสอบ', lastname: 'เทส'}
 ]
 
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-
-  const user = users.find((user) => user.username === username && user.password === password);
-
-  if (user) {
-    res.status(200).json({ message: 'เข้าสู่ระบบสำเร็จ', result:user });
-  } else {
-    res.status(401).json({ message: 'เข้าสู่ระบบไม่สำเร็จ' });
-  }
-});
-
-app.post('/filename', (req, res) => {
-  const username = req.params.username;
-  if (users[username]) {
-    res.json({
-      name: users[username].name,
-      lastname: users[username].lastname,
-    });
-  } else {
-    res.status(404).json({ error: 'ไม่พบผู้ใช้งาน' });
-  }
-});
-
 const dataSource = [
   {
     fullname: 'นางสาวนฤพร พัฒสงค์',
@@ -45,6 +21,7 @@ const dataSource = [
     raw_patient_id: '12303301022010141',
     create_hn_status: 'created',
     verify_status: 'notverify',
+    pdpa: 'doit',
     fix_gender_id: '2',
     birthdate: '2001-03-26',
     occupation: 'นักศึกษา',
@@ -78,6 +55,7 @@ const dataSource = [
     raw_patient_id: '12403301022010141',
     create_hn_status: 'notcreated',
     verify_status: 'verify',
+    pdpa: 'dontdoit',
     fix_gender_id: '1',
     birthdate: '1985-09-01',
     occupation: 'นักกฎหมาย',
@@ -111,6 +89,7 @@ const dataSource = [
     raw_patient_id: '12503301022010141',
     create_hn_status: 'created',
     verify_status: 'notverify',
+    pdpa: 'doit',
     fix_gender_id: '2',
     birthdate: '2002-11-13',
     occupation: 'นักศึกษา',
@@ -136,11 +115,56 @@ const dataSource = [
   }
 ]
 
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  const user = users.find((user) => user.username === username && user.password === password);
+
+  if (user) {
+    res.status(200).json({ message: 'เข้าสู่ระบบสำเร็จ', result:user });
+  } else {
+    res.status(401).json({ message: 'เข้าสู่ระบบไม่สำเร็จ' });
+  }
+});
+
+app.post('/filename', (req, res) => {
+  const username = req.params.username;
+  if (users[username]) {
+    res.json({
+      name: users[username].name,
+      lastname: users[username].lastname,
+    });
+  } else {
+    res.status(404).json({ error: 'ไม่พบผู้ใช้งาน' });
+  }
+});
+
+
 app.get('/api/data', (req, res) => {
  
   res.status(200).json({data:dataSource});
 });
 
+app.post('/hn', (req, res) => {
+  const { pid } = req.body;
+  const record = dataSource.find(item => item.pid === pid);
+  if (record) {
+    record.create_hn_status = 'created';
+    console.log(dataSource);
+    res.json({ data: dataSource });
+    
+  }
+});
+
+// app.post('/verify', (req, res) => {
+//   const { hncode } = req.body;
+//   const record = dataSource.find(item => item.hncode === hncode);
+//   if (record) {
+//     record.verify_status = 'verify';
+//     console.log(record);
+//     res.json({data: dataSource});
+//   }
+// })
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
